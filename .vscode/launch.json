@@ -33,22 +33,8 @@
                 "script",
             ],
             "jinja": true
-        },
-
-        {
-            "name": "InitDB",
-            "type": "python",
-            "request": "launch",
-            "module": "flask",
-            "env": {
-                "FLASK_APP": "commands.py",
-                "FLASK_ENV": "development"
-            },
-            "args": [
-                "initdb",
-            ],
-            "jinja": true
         }
-    
+
+        
     ]
 }
