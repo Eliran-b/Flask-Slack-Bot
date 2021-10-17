@@ -1,13 +1,10 @@
 from flask import Flask
 from flask_restful import Api
 import slack
-import os
-from pathlib import Path
-from dotenv import load_dotenv
 from datetime import datetime
 import pytz
 from slackeventsapi import SlackEventAdapter
-
+import subprocess
 
 app = Flask(__name__)
 
@@ -16,13 +13,13 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 api = Api(app)
 
 #client config
-env_path = Path('.') / '.env'
-load_dotenv(dotenv_path=env_path)
-client = slack.WebClient(token=os.environ['SLACK_TOKEN'])
+slack_token = str(subprocess.getstatusoutput(f'heroku config:get SLACK_TOKEN')[1])
+client = slack.WebClient(token=slack_token)
 #time zone
 tz = pytz.timezone('Israel')
 #post message
-slack_event_adapter = SlackEventAdapter(os.environ['SIGNING_SECRET'], 'slack/events', app)
+slack_signing_secret = str(subprocess.getstatusoutput(f'heroku config:get SIGNING_SECRET')[1])
+slack_event_adapter = SlackEventAdapter(slack_signing_secret, '/slack/events', app)
 client.chat_postMessage(channel='#content', text=str(datetime.now(tz).time()))
 
 
