@@ -1,5 +1,4 @@
 # Byte-compiled / optimized / DLL files
-__pycache__
 __pycache__/
 *.py[cod]
 *$py.class
@@ -127,6 +126,5 @@ cython_debug/
 .gitsecret/keys/random_seed
 
 #add
-.vscode
 
 
