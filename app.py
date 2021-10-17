@@ -1,67 +1,49 @@
-from resources.message import MessageRes, MessageCollection
-from resources.user import UserRegister, UserLogin
 from flask import Flask
 from flask_restful import Api
-from flask_jwt_extended import JWTManager
 from db import db
 from security import bcrypt
-from datetime import timedelta
 import subprocess
 import slack
-
-print(subprocess.getstatusoutput(f'heroku config:get SLACK_TOKEN')[1])
-client = slack.WebClient(token=subprocess.getstatusoutput(f'heroku config:get SLACK_TOKEN')[1])
+from datetime import datetime
+import pytz
+from slackeventsapi import SlackEventAdapter
 
 
 app = Flask(__name__)
 
-
-app.config['SECRET_KEY'] = str(subprocess.getstatusoutput(f'heroku config:get SECRET_KEY')[1])
-app.config['SQLALCHEMY_DATABASE_URI'] = str(subprocess.getstatusoutput(f'heroku config:get DATABASE_URL')[1])
-
-
-
-#app.config['JWT_SECRET_KEY'] = str(subprocess.getstatusoutput(f'heroku config:get JWT_SECRET_KEY')[1])
-#app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=int(subprocess.getstatusoutput(f'heroku config:get JWT_ACCESS_TOKEN_EXPIRES')[1]))
+#get the secret key and the uri from the heroku config var
+secret_key = str(subprocess.getstatusoutput(f'heroku config:get SECRET_KEY')[1])
+app.config['SECRET_KEY'] = secret_key
+db_uri = str(subprocess.getstatusoutput(f'heroku config:get DATABASE_URL')[1])
+app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-
 api = Api(app)
-jwt = JWTManager(app)
-
 
 db.init_app(app)
 bcrypt.init_app(app)
 
+#client config
+#get the token from the heroku config var
+token = str(subprocess.getstatusoutput(f'heroku config:get SLACK_TOKEN')[1])
+client = slack.WebClient(token=token)
+#time zone
+tz = pytz.timezone('Israel')
+#post message
+#get the secret key from heroku config vars
+'''
+signing_secret_key = str(subprocess.getstatusoutput(f'heroku config:get SLACK_SIGNING_SECRET')[1])
+slack_event_adapter = SlackEventAdapter(signing_secret_key, 'slack/events', app)
+client.chat_postMessage(channel='#content', text=str(datetime.now(tz).time()))
+'''
 
 
 
-
-api.add_resource(UserRegister, "/register", "/register/<string:username>/<string:password>")
-api.add_resource(UserLogin, "/login", "/login/<string:username>/<string:password>")
-
-api.add_resource(MessageRes, "/message", "/message/<string:receivers_username>/<string:message_body>/<string:message_subject>")
-api.add_resource(MessageCollection, "/messages")
-
-#login user
-@jwt.user_identity_loader
-def user_identity_lookup(user):
-    return user["username"]
-
-#activate every request when jwt is required 
-@jwt.user_lookup_loader
-def user_lookup_callback(_jwt_header, jwt_data):
-    identity = jwt_data["sub"]
-    from models.user import User
-    return User.query.filter_by(username=identity).one_or_none()
-
-
-    
 
 
 
 if __name__ == '__main__':
-    app.run()
-    #app.run(debug=True)  
+    #app.run()
+    app.run(debug=True)  
 
 
