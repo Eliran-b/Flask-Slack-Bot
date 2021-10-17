@@ -7,6 +7,10 @@ from db import db
 from security import bcrypt
 from datetime import timedelta
 import subprocess
+import slack
+
+print(subprocess.getstatusoutput(f'heroku config:get SLACK_TOKEN')[1])
+client = slack.WebClient(token=subprocess.getstatusoutput(f'heroku config:get SLACK_TOKEN')[1])
 
 
 app = Flask(__name__)
@@ -14,8 +18,11 @@ app = Flask(__name__)
 
 app.config['SECRET_KEY'] = str(subprocess.getstatusoutput(f'heroku config:get SECRET_KEY')[1])
 app.config['SQLALCHEMY_DATABASE_URI'] = str(subprocess.getstatusoutput(f'heroku config:get DATABASE_URL')[1])
-app.config['JWT_SECRET_KEY'] = str(subprocess.getstatusoutput(f'heroku config:get JWT_SECRET_KEY')[1])
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=int(subprocess.getstatusoutput(f'heroku config:get JWT_ACCESS_TOKEN_EXPIRES')[1]))
+
+
+
+#app.config['JWT_SECRET_KEY'] = str(subprocess.getstatusoutput(f'heroku config:get JWT_SECRET_KEY')[1])
+#app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=int(subprocess.getstatusoutput(f'heroku config:get JWT_ACCESS_TOKEN_EXPIRES')[1]))
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 

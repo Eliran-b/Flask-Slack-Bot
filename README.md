@@ -1,2 +1,1 @@
-This project contains great use of backend development using 100% of python flask agility in order to produce clean and readable code.
-The source code of messaging system contains api, json web token and postman requests with examples of input and output of GET, POST and DELETE requests.   
+This project contains Slack bot, which uploads every new tweet from the interesting sources I have chosen.
