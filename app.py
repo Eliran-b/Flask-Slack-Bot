@@ -17,7 +17,7 @@ client = slack.WebClient(token=slack_token)
 tz = pytz.timezone('Israel')
 #post message
 slack_signing_secret = str(subprocess.getstatusoutput(f'heroku config:get SIGNING_SECRET')[1])
-slack_event_adapter = SlackEventAdapter(slack_signing_secret, '/slack/events', app)
+#slack_event_adapter = SlackEventAdapter(slack_signing_secret, '/slack/events', app)
 client.chat_postMessage(channel='#content', text=str(datetime.now(tz).time()))
 
 
