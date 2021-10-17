@@ -8,8 +8,6 @@ import subprocess
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 api = Api(app)
 
 #client config
