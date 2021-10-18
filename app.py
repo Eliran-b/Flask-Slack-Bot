@@ -5,6 +5,7 @@ import pytz
 from slackeventsapi import SlackEventAdapter
 import subprocess
 from apscheduler.schedulers.background import BackgroundScheduler
+from werkzeug.exceptions import InternalServerError
 
 app = Flask(__name__)
 
@@ -33,8 +34,12 @@ def init_schedule():
 
 @app.route('/now', methods=['POST'])
 def now(): 
-    send_time_msg()
-    return Response(), 200
+    try:
+        send_time_msg()
+    except InternalServerError as e:
+        return {"message": e}
+    else:
+        return Response(), 200
 
 
 '''
@@ -68,8 +73,8 @@ tweet command - post a new tweet
 
 
 if __name__ == '__main__':
-    #app.run()
-    app.run(debug=True)  
+    app.run()
+    #app.run(debug=True)  
 
 
  
