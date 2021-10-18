@@ -34,6 +34,7 @@ def init_schedule():
 
 @app.route('/now', methods=['POST'])
 def now(): 
+    print('ok')
     try:
         send_time_msg()
     except InternalServerError as e:
