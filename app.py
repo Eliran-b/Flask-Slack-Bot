@@ -34,14 +34,15 @@ def init_schedule():
 
 @app.route('/now', methods=['POST'])
 def now(): 
-    print('ok')
+    return {}, 200
+    '''
     try:
         send_time_msg()
     except InternalServerError as e:
         return {"message": "Internal server error occurred"}, 500
     else:
         return {}, 200
-
+    '''
 
 '''
 @slack_event_adapter.on('new-content')
