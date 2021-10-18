@@ -1,7 +1,5 @@
-from flask import Flask, request, Response
+from flask import Flask
 import slack
-from datetime import datetime
-import pytz
 from slackeventsapi import SlackEventAdapter
 import subprocess
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -19,6 +17,8 @@ scheduler = BackgroundScheduler(daemon=True)
 scheduler.start()
 
 def send_time_msg(): 
+    from datetime import datetime
+    import pytz
     tz = pytz.timezone('Israel')
     msg = str(datetime.now(tz).hour)+":"+str(datetime.now(tz).minute)
     client.chat_postMessage(channel='#content', text=msg)
@@ -37,9 +37,9 @@ def now():
     try:
         send_time_msg()
     except InternalServerError as e:
-        return {"message": e}
+        return {"message": "Internal server error occurred"}, 500
     else:
-        return Response(), 200
+        return {}, 200
 
 
 '''
