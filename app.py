@@ -28,10 +28,10 @@ def init_schedule():
     scheduler.add_job(send_time_msg, 'interval',minutes=60)
 
 #create event == command sent by the user
-slack_signing_secret = str(subprocess.getstatusoutput(f'heroku config:get SIGNING_SECRET')[1])
-slack_event_adapter = SlackEventAdapter(slack_signing_secret, '/slack/events', app)
+#slack_signing_secret = str(subprocess.getstatusoutput(f'heroku config:get SIGNING_SECRET')[1])
+#slack_event_adapter = SlackEventAdapter(slack_signing_secret, '/slack/events', app)
 
-@app.route('/now')
+@app.route('/now', methods=['POST'])
 def now(): 
     send_time_msg()
     return Response(), 200
