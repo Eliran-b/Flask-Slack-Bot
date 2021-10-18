@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request, Response
 import slack
 from datetime import datetime
 import pytz
@@ -31,9 +31,10 @@ def init_schedule():
 slack_signing_secret = str(subprocess.getstatusoutput(f'heroku config:get SIGNING_SECRET')[1])
 slack_event_adapter = SlackEventAdapter(slack_signing_secret, '/slack/events', app)
 
-@slack_event_adapter.on('now')
+@app.route('/now')
 def now(): 
     send_time_msg()
+    return Response(), 200
 
 
 '''
