@@ -8,6 +8,10 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
 
+#client config
+slack_token = str(subprocess.getstatusoutput(f'heroku config:get SLACK_TOKEN')[1])
+client = slack.WebClient(token=slack_token)
+
 scheduler = BackgroundScheduler(daemon=True)
 
 #start thread
@@ -23,20 +27,42 @@ def init_schedule():
     #create schedule email notification
     scheduler.add_job(send_time_msg, 'interval',minutes=60)
 
+#create event == command sent by the user
+slack_signing_secret = str(subprocess.getstatusoutput(f'heroku config:get SIGNING_SECRET')[1])
+slack_event_adapter = SlackEventAdapter(slack_signing_secret, '/slack/events', app)
+
+@slack_event_adapter.on('now')
+def now(): 
+    send_time_msg()
 
 
-def send_msg(message): 
-    client.chat_postMessage(channel='#content', text=message)
+'''
+@slack_event_adapter.on('new-content')
+def new_content(): 
+    algorithm:
+    if there is no tweets in history or the last tweet is more than one hour back:
+        pull all twits from the last hour
+    else #if the last twit is less than one hour back
+        pull all the twits until that last twit time
+    message = twits
+    args = programming language
+    client.chat_postMessage(channel='#content', text=message, args)
+'''
+
+'''
+get all twits to the bot page
+
+'''
 
 
-#client config
-slack_token = str(subprocess.getstatusoutput(f'heroku config:get SLACK_TOKEN')[1])
-client = slack.WebClient(token=slack_token)
-#slack_signing_secret = str(subprocess.getstatusoutput(f'heroku config:get SIGNING_SECRET')[1])
-#slack_event_adapter = SlackEventAdapter(slack_signing_secret, '/slack/events', app)
+'''
+post new twits automatically to the bot - make sure every twit post once
+'''
 
 
-
+'''
+tweet command - post a new tweet
+'''
 
 
 
