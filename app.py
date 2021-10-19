@@ -16,15 +16,14 @@ api = Api(app)
 slack_token = str(subprocess.getstatusoutput(f'heroku config:get SLACK_TOKEN')[1])
 client = slack.WebClient(token=slack_token)
 
-'''
-#scheduler = BackgroundScheduler(daemon=True)
-'''
+
+scheduler = BackgroundScheduler(daemon=True)
 
 
+#start thread
+scheduler.start()
 
-'''
-@scheduler.scheduled_job('interval',minutes=60)
-'''
+
 #create schedule email notification
 def send_time_msg(): 
     tz = pytz.timezone('Israel')
@@ -32,10 +31,14 @@ def send_time_msg():
     client.chat_postMessage(channel='#content', text=msg)
     return msg
 
-#start thread
-'''
-scheduler.start()
-'''
+
+@app.before_first_request
+def init_scheduler():
+    scheduler.add_job(send_time_msg, 'interval',minutes=60)
+
+
+
+
 
 
 
