@@ -37,8 +37,8 @@ def now():
     channel_id = request.form.get('channel_id')
     #tz = pytz.timezone('Israel')
     #msg = str(datetime.now(tz).hour)+":"+str(datetime.now(tz).minute)
-    #client.chat_postMessage(channel=channel_id, text=msg)
-    return Response(channel_id), 200
+    client.chat_postMessage(channel=channel_id, text=str(channel_id))
+    return Response(request.form), 200
     
     '''
     try:
