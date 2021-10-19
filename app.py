@@ -1,9 +1,8 @@
-from flask import Flask, request, Response
+from flask import Flask, request
 from flask_restful import Api, Resource
 import slack
 import subprocess
 from apscheduler.schedulers.background import BackgroundScheduler
-from werkzeug.exceptions import InternalServerError
 from datetime import datetime
 import pytz
 #heroku from slackeventsapi import SlackEventAdapter
@@ -26,20 +25,19 @@ scheduler.start()
 
 #create schedule email notification
 def send_time_msg(): 
-    tz = pytz.timezone('Israel')
-    msg = str(datetime.now(tz).hour)+":"+str(datetime.now(tz).minute)
-    client.chat_postMessage(channel='#content', text=msg)
-    return msg
+    try:
+        tz = pytz.timezone('Israel')
+        msg = str(datetime.now(tz).hour)+":"+str(datetime.now(tz).minute)
+        client.chat_postMessage(channel='#content', text=msg)
+    except Exception as e:
+        print("Error: "+ type(e).__name__+ "\nMessage: "+ str(e))
+    else: 
+        return msg
 
 
 @app.before_first_request
 def init_scheduler():
     scheduler.add_job(send_time_msg, 'interval', minutes=60)
-
-
-
-
-
 
 
 #BOT_ID = client.api_call("auth.test")['user_id']
@@ -51,8 +49,8 @@ class Now(Resource):
     def post(self):
         try:
             message = send_time_msg()
-        except InternalServerError as e:
-            return {"error": e}, 500
+        except Exception as e:
+            return {"Error": type(e).__name__, "Message": str(e)}, 500
         else:    
             return {"message": message}, 200
 
