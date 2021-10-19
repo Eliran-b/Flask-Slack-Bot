@@ -16,14 +16,15 @@ api = Api(app)
 slack_token = str(subprocess.getstatusoutput(f'heroku config:get SLACK_TOKEN')[1])
 client = slack.WebClient(token=slack_token)
 
-scheduler = BackgroundScheduler(daemon=True)
+'''
+#scheduler = BackgroundScheduler(daemon=True)
+'''
 
 
 
-
-#BOT_ID = client.api_call("auth.test")['user_id']
-
+'''
 @scheduler.scheduled_job('interval',minutes=60)
+'''
 #create schedule email notification
 def send_time_msg(): 
     tz = pytz.timezone('Israel')
@@ -32,7 +33,13 @@ def send_time_msg():
     return msg
 
 #start thread
+'''
 scheduler.start()
+'''
+
+
+
+#BOT_ID = client.api_call("auth.test")['user_id']
 #create event == command sent by the user
 #slack_signing_secret = str(subprocess.getstatusoutput(f'heroku config:get SIGNING_SECRET')[1])
 #slack_event_adapter = SlackEventAdapter(slack_signing_secret, '/slack/events', app)
