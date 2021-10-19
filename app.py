@@ -18,24 +18,21 @@ client = slack.WebClient(token=slack_token)
 
 scheduler = BackgroundScheduler(daemon=True)
 
-#start thread
-scheduler.start()
+
 
 
 #BOT_ID = client.api_call("auth.test")['user_id']
 
-
+@scheduler.scheduled_job('interval',minutes=60)
+#create schedule email notification
 def send_time_msg(): 
     tz = pytz.timezone('Israel')
     msg = str(datetime.now(tz).hour)+":"+str(datetime.now(tz).minute)
     client.chat_postMessage(channel='#content', text=msg)
     return msg
 
-@app.before_first_request
-def init_schedule(): 
-    #create schedule email notification
-    scheduler.add_job(send_time_msg, 'interval',minutes=60)
-
+#start thread
+scheduler.start()
 #create event == command sent by the user
 #slack_signing_secret = str(subprocess.getstatusoutput(f'heroku config:get SIGNING_SECRET')[1])
 #slack_event_adapter = SlackEventAdapter(slack_signing_secret, '/slack/events', app)
