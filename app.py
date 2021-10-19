@@ -34,7 +34,14 @@ def init_schedule():
 
 @app.route('/now', methods=['POST'])
 def now(): 
+    from datetime import datetime
+    import pytz
+    tz = pytz.timezone('Israel')
+    msg = str(datetime.now(tz).hour)+":"+str(datetime.now(tz).minute)
+    client.chat_postMessage(channel='#content', text=msg)
     return {}, 200
+    
+    
     '''
     try:
         send_time_msg()
