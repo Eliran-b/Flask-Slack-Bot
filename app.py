@@ -39,27 +39,20 @@ def init_schedule():
 #create event == command sent by the user
 #slack_signing_secret = str(subprocess.getstatusoutput(f'heroku config:get SIGNING_SECRET')[1])
 #slack_event_adapter = SlackEventAdapter(slack_signing_secret, '/slack/events', app)
-'''
-@app.route('/now', methods=['POST'])
-def now(): 
-    try:
-        send_time_msg()
-    except:
-        return {"message": "Internal server error occurred"}, 500
-    else:    
-        return {}, 200
-'''
+
 class Now(Resource):
     def post(self):
         try:
             message = send_time_msg()
-        except:
-            return {"message": "Internal server error occurred"}, 500
+        except InternalServerError as e:
+            return {"error": e}, 500
         else:    
             return {"message": message}, 200
 
 
 api.add_resource(Now, "/now")
+
+
 
 '''
 @slack_event_adapter.on('new-content')
