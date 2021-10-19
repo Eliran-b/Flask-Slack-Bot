@@ -1,9 +1,11 @@
-from flask import Flask
+from flask import Flask, request, Response
 import slack
 from slackeventsapi import SlackEventAdapter
 import subprocess
 from apscheduler.schedulers.background import BackgroundScheduler
 from werkzeug.exceptions import InternalServerError
+from datetime import datetime
+import pytz
 
 app = Flask(__name__)
 
@@ -17,8 +19,6 @@ scheduler = BackgroundScheduler(daemon=True)
 scheduler.start()
 
 def send_time_msg(): 
-    from datetime import datetime
-    import pytz
     tz = pytz.timezone('Israel')
     msg = str(datetime.now(tz).hour)+":"+str(datetime.now(tz).minute)
     client.chat_postMessage(channel='#content', text=msg)
@@ -34,9 +34,11 @@ def init_schedule():
 
 @app.route('/now', methods=['POST'])
 def now(): 
-    msg="hi"
-    client.chat_postMessage(channel='#content', text=msg)
-    
+    channel_id = request.form.get('channel_id')
+    tz = pytz.timezone('Israel')
+    msg = str(datetime.now(tz).hour)+":"+str(datetime.now(tz).minute)
+    client.chat_postMessage(channel=channel_id, text=msg)
+    return Response(), 200
     
     '''
     try:
