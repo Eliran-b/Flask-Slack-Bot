@@ -22,13 +22,14 @@ scheduler = BackgroundScheduler(daemon=True)
 scheduler.start()
 
 
-BOT_ID = client.api_call("auth.test")['user_id']
+#BOT_ID = client.api_call("auth.test")['user_id']
 
 
 def send_time_msg(): 
     tz = pytz.timezone('Israel')
     msg = str(datetime.now(tz).hour)+":"+str(datetime.now(tz).minute)
     client.chat_postMessage(channel='#content', text=msg)
+    return msg
 
 @app.before_first_request
 def init_schedule(): 
@@ -51,11 +52,11 @@ def now():
 class Now(Resource):
     def post(self):
         try:
-            send_time_msg()
+            message = send_time_msg()
         except:
             return {"message": "Internal server error occurred"}, 500
         else:    
-            return {}, 200
+            return {"message": message}, 200
 
 
 api.add_resource(Now, "/now")
@@ -80,7 +81,7 @@ get all twits to the bot page
 
 
 '''
-post new twits automatically to the bot - make sure every twit post once
+post new twits to the bot - make sure every twit post once
 '''
 
 
