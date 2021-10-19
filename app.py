@@ -34,7 +34,7 @@ def send_time_msg():
 
 @app.before_first_request
 def init_scheduler():
-    scheduler.add_job(send_time_msg, 'interval',minutes=60)
+    scheduler.add_job(send_time_msg, 'interval', minutes=60)
 
 
 
