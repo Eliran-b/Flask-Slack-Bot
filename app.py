@@ -18,6 +18,10 @@ scheduler = BackgroundScheduler(daemon=True)
 #start thread
 scheduler.start()
 
+
+BOT_ID = client.api_call("auth.test")['user_id']
+
+
 def send_time_msg(): 
     tz = pytz.timezone('Israel')
     msg = str(datetime.now(tz).hour)+":"+str(datetime.now(tz).minute)
@@ -34,19 +38,13 @@ def init_schedule():
 
 @app.route('/now', methods=['POST'])
 def now(): 
-    #channel_id = request.form.get('channel_id')
-    tz = pytz.timezone('Israel')
-    #msg = str(datetime.now(tz).hour)+":"+str(datetime.now(tz).minute)
-    return Response(tz), 200
-    
-    '''
     try:
         send_time_msg()
-    except InternalServerError as e:
+    except:
         return {"message": "Internal server error occurred"}, 500
-    else:
+    else:    
         return {}, 200
-    '''
+    
 
 '''
 @slack_event_adapter.on('new-content')
