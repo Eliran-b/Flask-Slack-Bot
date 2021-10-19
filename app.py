@@ -1,4 +1,5 @@
 from flask import Flask, request, Response
+from flask_restful import Api, Resource
 import slack
 from slackeventsapi import SlackEventAdapter
 import subprocess
@@ -8,6 +9,8 @@ from datetime import datetime
 import pytz
 
 app = Flask(__name__)
+
+api = Api(app)
 
 #client config
 slack_token = str(subprocess.getstatusoutput(f'heroku config:get SLACK_TOKEN')[1])
@@ -35,7 +38,7 @@ def init_schedule():
 #create event == command sent by the user
 #slack_signing_secret = str(subprocess.getstatusoutput(f'heroku config:get SIGNING_SECRET')[1])
 #slack_event_adapter = SlackEventAdapter(slack_signing_secret, '/slack/events', app)
-
+'''
 @app.route('/now', methods=['POST'])
 def now(): 
     try:
@@ -44,7 +47,18 @@ def now():
         return {"message": "Internal server error occurred"}, 500
     else:    
         return {}, 200
-    
+'''
+class Now(Resource):
+    def post(self):
+        try:
+            send_time_msg()
+        except:
+            return {"message": "Internal server error occurred"}, 500
+        else:    
+            return {}, 200
+
+
+api.add_resource(Now, "/now")
 
 '''
 @slack_event_adapter.on('new-content')
