@@ -6,7 +6,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from werkzeug.exceptions import InternalServerError
 from datetime import datetime
 import pytz
-#from slackeventsapi import SlackEventAdapter
+#heroku from slackeventsapi import SlackEventAdapter
 
 app = Flask(__name__)
 
