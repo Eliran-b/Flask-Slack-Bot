@@ -34,7 +34,7 @@ def init_schedule():
 
 @app.route('/now', methods=['POST'])
 def now(): 
-    mag="hi"
+    msg="hi"
     client.chat_postMessage(channel='#content', text=msg)
     
     
