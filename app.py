@@ -34,11 +34,10 @@ def init_schedule():
 
 @app.route('/now', methods=['POST'])
 def now(): 
-    channel_id = request.form.get('channel_id')
-    #tz = pytz.timezone('Israel')
+    #channel_id = request.form.get('channel_id')
+    tz = pytz.timezone('Israel')
     #msg = str(datetime.now(tz).hour)+":"+str(datetime.now(tz).minute)
-    client.chat_postMessage(channel=channel_id, text=str(channel_id))
-    return Response(request.form), 200
+    return Response(tz), 200
     
     '''
     try:
