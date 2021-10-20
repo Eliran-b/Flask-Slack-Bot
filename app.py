@@ -1,5 +1,3 @@
-from flask import Flask, request
-from flask_restful import Api, Resource
 import slack
 import subprocess 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -41,6 +39,7 @@ def send_time_msg():
 #@app.before_first_request
 def init_scheduler():
     scheduler.add_job(send_time_msg, 'interval', minutes=60)
+
 
 #now command
 @app.command("/now")
@@ -86,7 +85,8 @@ if __name__ == "__main__":
 
 
 
-
+#from flask import Flask, request
+#from flask_restful import Api, Resource
 #from slackeventsapi import SlackEventAdapter
 
 
