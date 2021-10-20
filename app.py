@@ -1,15 +1,20 @@
+import os
 import slack
-import subprocess 
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
 import pytz
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
+from dotenv import load_dotenv
+from pathlib import Path
 
 
-slack_bot_token = str(subprocess.getstatusoutput(f'heroku config:get SLACK_BOT_TOKEN')[1])
-slack_app_token = str(subprocess.getstatusoutput(f'heroku config:get SLACK_APP_TOKEN')[1])
-content_channel_id = str(subprocess.getstatusoutput(f'heroku config:get CONTENT_CHANNEL_ID')[1])
+env_path = Path('.') / '.env'
+load_dotenv(dotenv_path=env_path)
+
+slack_bot_token = os.environ['SLACK_BOT_TOKEN']
+slack_app_token = os.environ['SLACK_APP_TOKEN']
+content_channel_id = os.environ['CONTENT_CHANNEL_ID']
 
 app = App(token=slack_bot_token)
 
