@@ -1,0 +1,5 @@
+heroku ps:scale web=1
+
+heroku run python
+from app import client, scheduler, init_scheduler
+init_scheduler()
