@@ -1,0 +1,10 @@
+{
+    "python.pythonPath": ".venv/bin/python3",
+    "cSpell.words": [
+        "gunicorn"
+    ],
+    "cSpell.ignoreWords": [
+        "initdb"
+    ]
+
+}
