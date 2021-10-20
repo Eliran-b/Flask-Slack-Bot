@@ -7,7 +7,6 @@ from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 
 
-
 slack_bot_token = str(subprocess.getstatusoutput(f'heroku config:get SLACK_BOT_TOKEN')[1])
 slack_app_token = str(subprocess.getstatusoutput(f'heroku config:get SLACK_APP_TOKEN')[1])
 content_channel_id = str(subprocess.getstatusoutput(f'heroku config:get CONTENT_CHANNEL_ID')[1])
