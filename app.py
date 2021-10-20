@@ -1,20 +1,23 @@
 from flask import Flask, request
 from flask_restful import Api, Resource
 import slack
-import subprocess
+import subprocess 
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
 import pytz
-#heroku from slackeventsapi import SlackEventAdapter
+from slack_bolt import App
+from slack_bolt.adapter.socket_mode import SocketModeHandler
 
-app = Flask(__name__)
 
-api = Api(app)
+
+slack_bot_token = str(subprocess.getstatusoutput(f'heroku config:get SLACK_BOT_TOKEN')[1])
+slack_app_token = str(subprocess.getstatusoutput(f'heroku config:get SLACK_APP_TOKEN')[1])
+content_channel_id = str(subprocess.getstatusoutput(f'heroku config:get CONTENT_CHANNEL_ID')[1])
+
+app = App(token=slack_bot_token)
 
 #client config
-slack_token = str(subprocess.getstatusoutput(f'heroku config:get SLACK_TOKEN')[1])
-client = slack.WebClient(token=slack_token)
-
+client = slack.WebClient(token=slack_bot_token)
 
 scheduler = BackgroundScheduler(daemon=True)
 
@@ -22,8 +25,7 @@ scheduler = BackgroundScheduler(daemon=True)
 #start thread
 scheduler.start()
 
-
-#create schedule email notification
+#send msg with the current time
 def send_time_msg(): 
     try:
         tz = pytz.timezone('Israel')
@@ -35,6 +37,89 @@ def send_time_msg():
         return msg
 
 
+#create schedule bot message
+#@app.before_first_request
+def init_scheduler():
+    scheduler.add_job(send_time_msg, 'interval', minutes=60)
+
+#now command
+@app.command("/now")
+def repeat_text(ack):
+    # Acknowledge command request
+    ack()
+    try:
+        message = send_time_msg()
+    except Exception as e:
+        return {"Error": type(e).__name__, "Message": str(e)}, 500
+    else:    
+        return {"message": message}, 200
+
+
+
+
+
+
+
+if __name__ == "__main__":
+    SocketModeHandler(app, slack_app_token).start()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#from slackeventsapi import SlackEventAdapter
+
+
+
+'''
+app = Flask(__name__)
+
+api = Api(app)
+
+#client config
+slack_token = str(subprocess.getstatusoutput(f'heroku config:get SLACK_BOT_TOKEN')[1])
+client = slack.WebClient(token=slack_token)
+
+
+scheduler = BackgroundScheduler(daemon=True)
+
+
+#start thread
+scheduler.start()
+
+#send msg with the current time
+def send_time_msg(): 
+    try:
+        tz = pytz.timezone('Israel')
+        msg = str(datetime.now(tz).hour)+":"+str(datetime.now(tz).minute)
+        client.chat_postMessage(channel='#content', text=msg)
+    except Exception as e:
+        print("Error: "+ type(e).__name__+ "\nMessage: "+ str(e))
+    else: 
+        return msg
+
+
+#create schedule bot message
 @app.before_first_request
 def init_scheduler():
     scheduler.add_job(send_time_msg, 'interval', minutes=60)
@@ -45,6 +130,7 @@ def init_scheduler():
 #slack_signing_secret = str(subprocess.getstatusoutput(f'heroku config:get SIGNING_SECRET')[1])
 #slack_event_adapter = SlackEventAdapter(slack_signing_secret, '/slack/events', app)
 
+#now command
 class Now(Resource):
     def post(self):
         try:
@@ -57,7 +143,7 @@ class Now(Resource):
 
 api.add_resource(Now, "/now")
 
-
+'''
 
 '''
 @slack_event_adapter.on('new-content')
@@ -89,8 +175,8 @@ tweet command - post a new tweet
 
 
 
-if __name__ == '__main__':
-    app.run()
+#if __name__ == '__main__':
+#    app.run()
     #app.run(debug=True)  
 
 
