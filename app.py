@@ -40,14 +40,18 @@ def send_time_msg():
 
 
 #create schedule bot message
-#@app.before_first_request
-def init_scheduler():
+@app.command("/init_sched")
+def init_scheduler(ack):
+    # Acknowledge command request
+    ack()
     scheduler.add_job(send_time_msg, 'interval', minutes=60)
+    client.chat_postMessage(channel='#content', text="Schedule Started")
+
 
 
 #now command
 @app.command("/now")
-def repeat_text(ack):
+def now(ack):
     # Acknowledge command request
     ack()
     try:
@@ -65,27 +69,6 @@ def repeat_text(ack):
 
 if __name__ == "__main__":
     SocketModeHandler(app, slack_app_token).start()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
