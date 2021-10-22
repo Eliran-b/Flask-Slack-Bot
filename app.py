@@ -10,7 +10,7 @@ from pathlib import Path
 from slack_sdk.web.client import WebClient
 import tweepy as tw
 
-
+#.env file path 
 env_path = Path('.') / '.env'
 load_dotenv(dotenv_path=env_path)
 
@@ -22,12 +22,12 @@ content_channel_id = os.environ['CONTENT_CHANNEL_ID']
 #twitter vars
 consumer_key = os.environ['TWITTER_API_KEY']
 consumer_secret = os.environ['TWITTER_API_SECRET']
-callback_uri = os.environ['CALLBACK_URI']
 access_token = os.environ['ACCESS_TOKEN']
 access_token_secret = os.environ['ACCESS_TOKEN_SECRET']
 
+#configurations
 app = App(token=slack_bot_token)
-auth = tw.OAuthHandler(consumer_key, consumer_secret) #, callback_uri)
+auth = tw.OAuthHandler(consumer_key, consumer_secret) 
 auth.set_access_token(access_token, access_token_secret)
 api = tw.API(auth)
 
@@ -35,15 +35,16 @@ api = tw.API(auth)
 #client config
 client = slack.WebClient(token=slack_bot_token)
 
+#scheduler for cron tasks
 scheduler = BackgroundScheduler(daemon=True)
-
 
 #start thread
 scheduler.start()
 
 
 #send msg with the current time
-def send_time_msg(): 
+def send_time_msg():
+    """Send a message with the corrent hour to slack bot channel""" 
     try:
         tz = pytz.timezone('Israel')
         msg = str(datetime.now(tz).hour)+":"+str(datetime.now(tz).minute)
@@ -57,6 +58,7 @@ def send_time_msg():
 #create schedule bot message - run before first request
 @app.command("/init_sched")
 def init_scheduler(ack):
+    """Initialize the scheduler thread""" 
     # Acknowledge command request
     ack()
     scheduler.add_job(send_time_msg, 'interval', minutes=60)
