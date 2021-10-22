@@ -1,3 +1,4 @@
+from logging import StreamHandler
 import os
 import slack
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -7,16 +8,35 @@ from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 from dotenv import load_dotenv
 from pathlib import Path
+from slack_sdk.web.client import WebClient
+import tweepy as tw
+import pandas as pd
 
 
 env_path = Path('.') / '.env'
 load_dotenv(dotenv_path=env_path)
 
+#slack vars
 slack_bot_token = os.environ['SLACK_BOT_TOKEN']
 slack_app_token = os.environ['SLACK_APP_TOKEN']
 content_channel_id = os.environ['CONTENT_CHANNEL_ID']
 
+#twitter vars
+consumer_key = os.environ['TWITTER_API_KEY']
+consumer_secret = os.environ['TWITTER_API_SECRET']
+callback_uri = os.environ['CALLBACK_URI']
+access_token = os.environ['ACCESS_TOKEN']
+access_token_secret = os.environ['ACCESS_TOKEN_SECRET']
+
 app = App(token=slack_bot_token)
+auth = tw.OAuthHandler(consumer_key, consumer_secret, callback_uri)
+auth.set_access_token(access_token, access_token_secret)
+api = tw.API(auth)
+
+# Get the User object for twitter...
+user = api.get_user(screen_name='twitter')
+
+
 
 #client config
 client = slack.WebClient(token=slack_bot_token)
@@ -26,6 +46,10 @@ scheduler = BackgroundScheduler(daemon=True)
 
 #start thread
 scheduler.start()
+
+
+
+
 
 #send msg with the current time
 def send_time_msg(): 
@@ -39,7 +63,7 @@ def send_time_msg():
         return msg
 
 
-#create schedule bot message
+#create schedule bot message - run before first request
 @app.command("/init_sched")
 def init_scheduler(ack):
     # Acknowledge command request
@@ -52,6 +76,7 @@ def init_scheduler(ack):
 #now command
 @app.command("/now")
 def now(ack):
+    """Post to the slack bot the current hour"""
     # Acknowledge command request
     ack()
     try:
@@ -62,12 +87,55 @@ def now(ack):
         return {"message": message}, 200
 
 
+#twitter pages names and programming languages
+pages_dict = {"python": ["Python Weekly", "Real Python", "Full Stack Python"],
+                "javascript": ["JavaScript Daily"],
+                "c#": ["C# StackOverflow"],
+                "c++": ["Jason Turner"]
+                }
+
+#pull twits from #Python Weekly, #Real Python, #Full Stack Python, #JavaScript Daily, #C# StackOverflow, #Jason Turner (for C++)
+@app.command("/new_content")
+def now(ack, payload):
+    """Call this method by type /new_content and The Programming language tweets you want
+        Programming Languages: c++, javascript, python, c#
+    """
+    # Acknowledge command request
+    ack()
+    text=payload['text']
+    #if the programming language doesn't exist in the pages options 
+    if not text:
+        client.chat_postMessage(channel='#content', text="Please add the command a message content in this format:\n /new_content your_programming_language\nYou can choose one of these programming languages:\nc++ | javascript | c# | python ")
+    else:
+        pass
+    #if there is no tweets in history or the last tweet is more than one hour back:
+    #    pull all twits from the last hour
+    #if the last twit is less than one hour back
+    #    pull all the twits until that last twit time
+    #message = twits
+    #args = programming language
+    #client.chat_postMessage(channel='#content', text=message, args)
+    
+
+
+#send /tweet and after it what you want to say
+@app.command("/tweet")
+def tweet(ack, payload):
+    """Call this method by type /tweet and The message content you wish to post"""
+    # Acknowledge command request
+    ack()
+    text=payload['text']
+    if not text:
+        client.chat_postMessage(channel='#content', text="Please add the command a message content in this format:\n /tweet your_message_content")
+    else:
+        api.update_status(status=text)
 
 
 
 
 
 if __name__ == "__main__":
+
     SocketModeHandler(app, slack_app_token).start()
 
 
