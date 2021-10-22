@@ -2,12 +2,11 @@ import os
 import slack
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timedelta
-import pytz
+import pytz 
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 from dotenv import load_dotenv
 from pathlib import Path
-from slack_sdk.web.client import WebClient
 import tweepy as tw
 
 #.env file path 
