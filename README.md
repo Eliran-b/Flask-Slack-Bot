@@ -1,1 +1,1 @@
-This project contains Slack bot, which uploads every new tweet from the interesting sources I have chosen.
+This project contains a Twitter Slack bot, which uploads every new tweet from the interesting sources I have chosen, analyze tweets data and send tweets from slack app.
